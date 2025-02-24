@@ -8,6 +8,7 @@ export interface IStorage {
     metadata?: unknown;
   }): Promise<Image>;
   getImage(id: number): Promise<Image | undefined>;
+  getAllImages(): Promise<Image[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -39,6 +40,11 @@ export class MemStorage implements IStorage {
 
   async getImage(id: number): Promise<Image | undefined> {
     return this.images.get(id);
+  }
+
+  async getAllImages(): Promise<Image[]> {
+    return Array.from(this.images.values())
+      .sort((a, b) => b.id - a.id); // Most recent first
   }
 }
 

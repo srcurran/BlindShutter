@@ -3,15 +3,23 @@ import { motion, AnimatePresence } from "framer-motion";
 import { CameraButton } from "@/components/camera/camera-button";
 import { GradientBackground } from "@/components/camera/gradient-background";
 import { ResultImage } from "@/components/camera/result-image";
-import { useMutation } from "@tanstack/react-query";
+import { ImageGallery } from "@/components/gallery/image-gallery";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { validateImageData } from "@/lib/openai";
+import type { Image } from "@shared/schema";
 
 export default function Home() {
   const [processing, setProcessing] = useState(false);
   const [result, setResult] = useState<string | null>(null);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const { toast } = useToast();
+
+  // Fetch previous images
+  const { data: images = [] } = useQuery<Image[]>({
+    queryKey: ['/api/images'],
+  });
 
   const { mutate: processImage, isPending } = useMutation({
     mutationFn: async (base64Image: string) => {
@@ -39,7 +47,6 @@ export default function Home() {
       console.error("Error in image processing:", error);
       let errorMessage = "Failed to process image. Please try again.";
 
-      // Handle specific error messages from the backend
       if (error.message?.includes("billing limit reached")) {
         errorMessage = "API billing limit reached. Please try again later.";
       } else if (error.message?.includes("quota exceeded")) {
@@ -113,6 +120,12 @@ export default function Home() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <ImageGallery 
+        images={images}
+        isOpen={isGalleryOpen}
+        onOpenChange={setIsGalleryOpen}
+      />
     </div>
   );
 }

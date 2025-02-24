@@ -19,10 +19,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log("Starting image processing...");
 
-      // Generate image based on the original
+      // First, analyze the image with GPT-4 Vision
+      const visionResponse = await openai.chat.completions.create({
+        model: "gpt-4-vision-preview",
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: "Describe this image with extreme precision and detail. Focus on spatial relationships, colors, textures, lighting, and composition. The description will be used to recreate the image as accurately as possible."
+              },
+              {
+                type: "image_url",
+                image_url: {
+                  url: `data:image/jpeg;base64,${image}`
+                }
+              }
+            ],
+          },
+        ],
+        max_tokens: 1000
+      });
+
+      const description = visionResponse.choices[0].message.content;
+      if (!description) {
+        throw new Error("Failed to generate image description");
+      }
+
+      console.log("Generated description:", description);
+
+      // Then use DALL-E to recreate the image based on the detailed description
       const imageResponse = await openai.images.generate({
         model: "dall-e-3",
-        prompt: "Create a unique artistic interpretation that captures the essence and mood of the original image while adding creative elements. The result should be photorealistic but with an imaginative twist.",
+        prompt: `Recreate this scene photorealistically: ${description}. Focus on precise details and maintain accurate proportions. The result should look as close as possible to a real photograph while capturing all the described elements perfectly.`,
         n: 1,
         size: "1024x1024",
         quality: "standard",
@@ -36,7 +66,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const result = await storage.createImage({
         originalImage: image,
-        aiDescription: null,
+        aiDescription: description,
         generatedImage: imageResponse.data[0].url,
         metadata: { timestamp: new Date() }
       });
@@ -67,6 +97,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ 
         error: "Failed to process image. Please try again." 
       });
+    }
+  });
+
+  app.get("/api/images", async (_req, res) => {
+    try {
+      const images = await storage.getAllImages();
+      res.json(images);
+    } catch (error) {
+      console.error("Error fetching images:", error);
+      res.status(500).json({ error: "Failed to fetch images" });
     }
   });
 
