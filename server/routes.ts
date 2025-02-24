@@ -19,9 +19,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log("Starting image processing...");
 
-      // First, analyze the image with GPT-4 Vision
+      // First, analyze the image with GPT-4V
       const visionResponse = await openai.chat.completions.create({
-        model: "gpt-4-vision-preview",
+        model: "gpt-4v", // Updated to the current vision model
         messages: [
           {
             role: "user",
@@ -91,6 +91,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error?.error?.code === "billing_hard_limit_reached") {
         return res.status(402).json({ 
           error: "API billing limit reached. Please try again later."
+        });
+      }
+
+      if (error?.error?.code === "model_not_found") {
+        return res.status(500).json({ 
+          error: "API configuration error. Please try again later."
         });
       }
 

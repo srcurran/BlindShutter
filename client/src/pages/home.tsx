@@ -55,6 +55,8 @@ export default function Home() {
         errorMessage = "Too many requests. Please wait a moment and try again.";
       } else if (error.message?.includes("Invalid image data")) {
         errorMessage = "Invalid image format. Please try again.";
+      } else if (error.message?.includes("API configuration error")) {
+        errorMessage = "There was an issue with the image processing service. Please try again later.";
       }
 
       toast({
