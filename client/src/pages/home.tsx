@@ -21,13 +21,25 @@ export default function Home() {
       return data;
     },
     onSuccess: (data) => {
+      if (!data.generatedImage) {
+        throw new Error("No image was generated");
+      }
       setResult(data.generatedImage);
       setProcessing(false);
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      let errorMessage = "Failed to process image. Please try again.";
+
+      // Handle specific error messages from the backend
+      if (error.message?.includes("quota exceeded")) {
+        errorMessage = "API quota exceeded. Please try again later.";
+      } else if (error.message?.includes("Too many requests")) {
+        errorMessage = "Too many requests. Please wait a moment and try again.";
+      }
+
       toast({
         title: "Error",
-        description: "Failed to process image. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
       setProcessing(false);
@@ -36,13 +48,14 @@ export default function Home() {
 
   const handleCapture = async (base64Image: string) => {
     setProcessing(true);
+    setResult(null);
     processImage(base64Image);
   };
 
   return (
     <div className="min-h-screen relative overflow-hidden">
       <GradientBackground />
-      
+
       <AnimatePresence>
         {!processing && !result && (
           <motion.div

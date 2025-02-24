@@ -19,14 +19,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Analyze image with OpenAI Vision
       const visionResponse = await openai.chat.completions.create({
-        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024
+        model: "gpt-4-vision-preview", // Using the correct model for vision tasks
         messages: [
           {
             role: "user",
             content: [
               {
                 type: "text",
-                text: "recreate this image in a photorealistic style by describing it as accurately and with as much detail as possible and then recreating it"
+                text: "Describe this image in extreme detail, focusing on capturing every visual element precisely. Include details about composition, colors, subjects, and any notable features."
               },
               {
                 type: "image_url",
@@ -40,26 +40,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
         max_tokens: 1000
       });
 
+      const description = visionResponse.choices[0].message.content;
+      if (!description) {
+        throw new Error("Failed to generate image description");
+      }
+
       // Generate new image based on the description
       const imageResponse = await openai.images.generate({
         model: "dall-e-3",
-        prompt: visionResponse.choices[0].message.content || "",
+        prompt: `Create a photorealistic recreation of this scene: ${description}. Maintain accurate proportions and realistic details.`,
         n: 1,
         size: "1024x1024",
         quality: "standard",
       });
 
+      if (!imageResponse.data[0]?.url) {
+        throw new Error("Failed to generate image");
+      }
+
       const result = await storage.createImage({
         originalImage: image,
-        aiDescription: visionResponse.choices[0].message.content || "",
+        aiDescription: description,
         generatedImage: imageResponse.data[0].url,
         metadata: { timestamp: new Date() }
       });
 
       res.json(result);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error processing image:", error);
-      res.status(500).json({ error: "Failed to process image" });
+
+      // Handle specific OpenAI errors
+      if (error?.error?.type === "insufficient_quota") {
+        return res.status(402).json({ 
+          error: "OpenAI API quota exceeded. Please try again later." 
+        });
+      }
+
+      if (error?.status === 429) {
+        return res.status(429).json({ 
+          error: "Too many requests. Please try again later." 
+        });
+      }
+
+      res.status(500).json({ 
+        error: "Failed to process image. Please try again." 
+      });
     }
   });
 
