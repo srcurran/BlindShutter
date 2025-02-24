@@ -8,6 +8,8 @@ if (!process.env.OPENAI_API_KEY) {
 }
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+import Anthropic from '@anthropic-ai/sdk';
+const anthropic = new Anthropic({ apiKey: process.env.CLAUDE_API_KEY });
 
 export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/process-image", async (req, res) => {
@@ -19,30 +21,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log("Starting image processing...");
 
-      // First, analyze the image with GPT-4V
-      const visionResponse = await openai.chat.completions.create({
-        model: "gpt-4o", 
-        messages: [
-          {
-            role: "user",
-            content: [
-              {
-                type: "text",
-                text: "Describe this image with extreme precision and detail. Focus on spatial relationships, colors, textures, lighting, and composition. The description will be used to recreate the image as accurately as possible."
-              },
-              {
-                type: "image_url",
-                image_url: {
-                  url: `data:image/jpeg;base64,${image}`
-                }
+      // First, analyze the image with Claude
+      const visionResponse = await anthropic.messages.create({
+        model: "claude-3-opus-20240229",
+        max_tokens: 1000,
+        messages: [{
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: "Describe this image with extreme precision and detail. Focus on spatial relationships, colors, textures, lighting, and composition. The description will be used to recreate the image as accurately as possible."
+            },
+            {
+              type: "image",
+              source: {
+                type: "base64",
+                media_type: "image/jpeg",
+                data: image
               }
-            ],
-          },
-        ],
-        max_tokens: 1000
+            }
+          ]
+        }]
       });
 
-      const description = visionResponse.choices[0].message.content;
+      const description = visionResponse.content[0].text;
       if (!description) {
         throw new Error("Failed to generate image description");
       }
