@@ -31,7 +31,9 @@ export default function Home() {
       let errorMessage = "Failed to process image. Please try again.";
 
       // Handle specific error messages from the backend
-      if (error.message?.includes("quota exceeded")) {
+      if (error.message?.includes("billing limit reached")) {
+        errorMessage = "API billing limit reached. Please try again later.";
+      } else if (error.message?.includes("quota exceeded")) {
         errorMessage = "API quota exceeded. Please try again later.";
       } else if (error.message?.includes("Too many requests")) {
         errorMessage = "Too many requests. Please wait a moment and try again.";

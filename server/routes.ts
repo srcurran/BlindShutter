@@ -54,6 +54,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
+      if (error?.error?.code === "billing_hard_limit_reached") {
+        return res.status(402).json({ 
+          error: "API billing limit reached. Please try again later."
+        });
+      }
+
       res.status(500).json({ 
         error: "Failed to process image. Please try again." 
       });
