@@ -21,7 +21,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // First, analyze the image with GPT-4V
       const visionResponse = await openai.chat.completions.create({
-        model: "gpt-4v", // Updated to the current vision model
+        model: "gpt-4o", 
         messages: [
           {
             role: "user",
