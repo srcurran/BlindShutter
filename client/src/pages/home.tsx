@@ -6,6 +6,7 @@ import { ResultImage } from "@/components/camera/result-image";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { validateImageData } from "@/lib/openai";
 
 export default function Home() {
   const [processing, setProcessing] = useState(false);
@@ -14,6 +15,12 @@ export default function Home() {
 
   const { mutate: processImage, isPending } = useMutation({
     mutationFn: async (base64Image: string) => {
+      console.log("Starting image processing request...");
+
+      if (!validateImageData(base64Image)) {
+        throw new Error("Invalid image data");
+      }
+
       const response = await apiRequest("POST", "/api/process-image", {
         image: base64Image,
       });
@@ -21,6 +28,7 @@ export default function Home() {
       return data;
     },
     onSuccess: (data) => {
+      console.log("Image processed successfully:", data);
       if (!data.generatedImage) {
         throw new Error("No image was generated");
       }
@@ -28,6 +36,7 @@ export default function Home() {
       setProcessing(false);
     },
     onError: (error: any) => {
+      console.error("Error in image processing:", error);
       let errorMessage = "Failed to process image. Please try again.";
 
       // Handle specific error messages from the backend
@@ -37,6 +46,8 @@ export default function Home() {
         errorMessage = "API quota exceeded. Please try again later.";
       } else if (error.message?.includes("Too many requests")) {
         errorMessage = "Too many requests. Please wait a moment and try again.";
+      } else if (error.message?.includes("Invalid image data")) {
+        errorMessage = "Invalid image format. Please try again.";
       }
 
       toast({
@@ -49,6 +60,7 @@ export default function Home() {
   });
 
   const handleCapture = async (base64Image: string) => {
+    console.log("Image captured, starting processing...");
     setProcessing(true);
     setResult(null);
     processImage(base64Image);

@@ -17,6 +17,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Image is required" });
       }
 
+      console.log("Starting image processing...");
+
       // Generate image based on the original
       const imageResponse = await openai.images.generate({
         model: "dall-e-3",
@@ -29,6 +31,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!imageResponse.data[0]?.url) {
         throw new Error("Failed to generate image");
       }
+
+      console.log("Image generated successfully:", imageResponse.data[0].url);
 
       const result = await storage.createImage({
         originalImage: image,
