@@ -2,13 +2,17 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import OpenAI from "openai";
+import Anthropic from '@anthropic-ai/sdk';
 
 if (!process.env.OPENAI_API_KEY) {
   throw new Error("OPENAI_API_KEY is required");
 }
 
+if (!process.env.CLAUDE_API_KEY) {
+  throw new Error("CLAUDE_API_KEY is required");
+}
+
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-import Anthropic from '@anthropic-ai/sdk';
 const anthropic = new Anthropic({ apiKey: process.env.CLAUDE_API_KEY });
 
 export async function registerRoutes(app: Express): Promise<Server> {
