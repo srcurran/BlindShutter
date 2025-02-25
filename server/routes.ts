@@ -96,13 +96,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (error?.error?.code === "billing_hard_limit_reached") {
         return res.status(402).json({ 
-          error: "API billing limit reached. Please try again later."
+          error: "API billing limit reached. Please try again later." 
         });
       }
 
       if (error?.error?.code === "model_not_found") {
         return res.status(500).json({ 
-          error: "API configuration error. Please try again later."
+          error: "API configuration error. Please try again later." 
+        });
+      }
+
+      // Handle Anthropic-specific errors
+      if (error?.status === 400 && error.error?.message?.includes("credit balance")) {
+        return res.status(402).json({
+          error: "Image analysis service unavailable. Please try again later."
         });
       }
 

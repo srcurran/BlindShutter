@@ -57,6 +57,8 @@ export default function Home() {
         errorMessage = "Invalid image format. Please try again.";
       } else if (error.message?.includes("API configuration error")) {
         errorMessage = "There was an issue with the image processing service. Please try again later.";
+      } else if (error.message?.includes("Image analysis service unavailable")) {
+        errorMessage = "Image analysis service is temporarily unavailable. Please try again later.";
       }
 
       toast({
