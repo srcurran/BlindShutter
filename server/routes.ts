@@ -9,7 +9,6 @@ if (!process.env.OPENAI_API_KEY) {
 
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-const anthropic = new Anthropic({ apiKey: process.env.CLAUDE_API_KEY });
 
 export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/process-image", async (req, res) => {
@@ -23,7 +22,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // First, analyze the image with gpt
       const visionResponse = await openai.chat.completions.create({
-        model: "gpt-4-vision-preview",
+        model: "gpt-4o",
         max_tokens: 1000,
         messages: [{
           role: "user",
