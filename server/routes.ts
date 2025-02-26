@@ -2,15 +2,11 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import OpenAI from "openai";
-import Anthropic from '@anthropic-ai/sdk';
 
 if (!process.env.OPENAI_API_KEY) {
   throw new Error("OPENAI_API_KEY is required");
 }
 
-if (!process.env.CLAUDE_API_KEY) {
-  throw new Error("CLAUDE_API_KEY is required");
-}
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const anthropic = new Anthropic({ apiKey: process.env.CLAUDE_API_KEY });
@@ -25,8 +21,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log("Starting image processing...");
 
-      // First, analyze the image with Claude
-      const visionResponse = await anthropic.messages.create({
+      // First, analyze the image with gpt
+      const visionResponse = await openai.messages.create({
         model: "gpt-4o",
         max_tokens: 1000,
         messages: [{
