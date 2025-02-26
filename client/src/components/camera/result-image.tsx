@@ -13,7 +13,7 @@ export function ResultImage({ imageUrl, onReset }: ResultImageProps) {
       const response = await fetch(imageUrl);
       const blob = await response.blob();
       const file = new File([blob], "ai-photo.jpg", { type: "image/jpeg" });
-      
+
       if (navigator.share) {
         await navigator.share({
           files: [file],
@@ -42,7 +42,7 @@ export function ResultImage({ imageUrl, onReset }: ResultImageProps) {
     <motion.div
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="w-full max-w-md mx-4 bg-white rounded-lg overflow-hidden shadow-xl"
+      className="w-full max-w-sm mx-auto bg-white/10 backdrop-blur-md rounded-3xl p-4 shadow-lg" // Updated styling
     >
       <motion.img
         initial={{ opacity: 0 }}
@@ -50,35 +50,34 @@ export function ResultImage({ imageUrl, onReset }: ResultImageProps) {
         transition={{ delay: 0.2 }}
         src={imageUrl}
         alt="AI Generated"
-        className="w-full h-auto"
+        className="w-full rounded-2xl" // Updated styling
       />
-      
-      <div className="p-4 flex justify-between items-center bg-white">
+
+      <div className="flex gap-2">
         <Button
           variant="outline"
-          size="icon"
+          size="sm" // Adjusted size for better fit
+          className="flex-1 py-2.5 bg-white/10 rounded-xl text-white text-sm hover:bg-white/15 transition-colors" // Updated styling
           onClick={onReset}
         >
-          <RotateCcw className="h-4 w-4" />
+          Try Again
         </Button>
-
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleDownload}
-          >
-            <Download className="h-4 w-4" />
-          </Button>
-          
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleShare}
-          >
-            <Share2 className="h-4 w-4" />
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          size="sm" // Adjusted size for better fit
+          className="flex-1 py-2.5 bg-white/10 rounded-xl text-white text-sm hover:bg-white/15 transition-colors" // Updated styling
+          onClick={handleDownload}
+        >
+          Download
+        </Button>
+        <Button
+          variant="outline"
+          size="sm" // Adjusted size for better fit
+          className="flex-1 py-2.5 bg-white/10 rounded-xl text-white text-sm hover:bg-white/15 transition-colors" // Updated styling
+          onClick={handleShare}
+        >
+          Share
+        </Button>
       </div>
     </motion.div>
   );
