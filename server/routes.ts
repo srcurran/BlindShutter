@@ -22,8 +22,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Starting image processing...");
 
       // First, analyze the image with gpt
-      const visionResponse = await openai.messages.create({
-        model: "gpt-4o",
+      const visionResponse = await openai.chat.completions.create({
+        model: "gpt-4-vision-preview",
         max_tokens: 1000,
         messages: [{
           role: "user",
@@ -33,18 +33,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
               text: "Describe this image with extreme precision and detail. Focus on spatial relationships, colors, textures, lighting, and composition. The description will be used to recreate the image as accurately as possible."
             },
             {
-              type: "image",
-              source: {
-                type: "base64",
-                media_type: "image/jpeg",
-                data: image
+              type: "image_url",
+              image_url: {
+                url: `data:image/jpeg;base64,${image}`
               }
             }
           ]
         }]
       });
 
-      const description = visionResponse.content[0].text;
+      const description = visionResponse.choices[0].message.content;
       if (!description) {
         throw new Error("Failed to generate image description");
       }
