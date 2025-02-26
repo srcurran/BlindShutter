@@ -27,7 +27,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // First, analyze the image with Claude
       const visionResponse = await anthropic.messages.create({
-        model: "claude-3-opus-20240229",
+        model: "gpt-4o",
         max_tokens: 1000,
         messages: [{
           role: "user",
