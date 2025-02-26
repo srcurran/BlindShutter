@@ -1,12 +1,13 @@
 
-import React, { useState } from 'react';
-import { StyleSheet, View, Image, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
+import React, { useState, useRef } from 'react';
+import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { RNCamera } from 'react-native-camera';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 export default function App() {
   const [processing, setProcessing] = useState(false);
   const [result, setResult] = useState<string | null>(null);
+  const cameraRef = useRef<RNCamera | null>(null);
 
   const { data: images = [] } = useQuery({
     queryKey: ['/api/images'],
@@ -37,32 +38,35 @@ export default function App() {
     },
   });
 
-  const takePhoto = async () => {
-    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-    
-    if (permissionResult.granted === false) {
-      alert("Camera permission is required");
-      return;
-    }
-
-    const result = await ImagePicker.launchCameraAsync({
-      base64: true,
-      quality: 0.7,
-    });
-
-    if (!result.canceled && result.assets[0].base64) {
-      setProcessing(true);
-      setResult(null);
-      processImage(result.assets[0].base64);
+  const takePicture = async () => {
+    if (cameraRef.current) {
+      try {
+        const options = { quality: 0.7, base64: true };
+        const data = await cameraRef.current.takePictureAsync(options);
+        if (data.base64) {
+          setProcessing(true);
+          setResult(null);
+          processImage(data.base64);
+        }
+      } catch (error) {
+        console.error("Error taking picture:", error);
+      }
     }
   };
 
   return (
     <View style={styles.container}>
       {!processing && !result && (
-        <TouchableOpacity onPress={takePhoto} style={styles.button}>
-          <Text style={styles.buttonText}>Take Photo</Text>
-        </TouchableOpacity>
+        <RNCamera
+          ref={cameraRef}
+          style={styles.camera}
+          type={RNCamera.Constants.Type.back}
+          captureAudio={false}
+        >
+          <TouchableOpacity onPress={takePicture} style={styles.button}>
+            <Text style={styles.buttonText}>Take Photo</Text>
+          </TouchableOpacity>
+        </RNCamera>
       )}
 
       {(processing || isPending) && (
@@ -97,27 +101,34 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+  },
+  camera: {
+    flex: 1,
   },
   button: {
     backgroundColor: '#4CAF50',
     padding: 20,
     borderRadius: 10,
+    margin: 20,
   },
   buttonText: {
     color: 'white',
     fontSize: 18,
+    textAlign: 'center',
   },
   loadingContainer: {
+    flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   loadingText: {
     marginTop: 20,
     fontSize: 16,
   },
   resultContainer: {
+    flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   resultImage: {
     width: 300,
