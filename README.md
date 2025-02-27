@@ -21,7 +21,7 @@ The server will run on `0.0.0.0:5000`
 
 1. Install React Native CLI globally:
 ```bash
-npm install -g react-native-cli
+npx @react-native-community/cli init BlindShutter
 ```
 
 2. Install iOS dependencies:

@@ -79,7 +79,7 @@
     "zod-validation-error": "^3.4.0"
   },
   "devDependencies": {
-    "@react-native-community/cli": "^15.1.3",
+    "@react-native-community/cli": "latest",
     "@replit/vite-plugin-cartographer": "^0.0.2",
     "@replit/vite-plugin-runtime-error-modal": "^0.0.3",
     "@tailwindcss/typography": "^0.5.15",
