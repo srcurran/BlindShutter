@@ -5,3 +5,7 @@
 
 [dev]
   framework = "#custom"
+
+[build.environment]
+  NPM_FLAGS = "--platform=linux --arch=x64"
+
