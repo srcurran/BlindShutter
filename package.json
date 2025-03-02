@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.37.0",
+    "@babel/preset-typescript": "^7.0.0-0",
     "@hookform/resolvers": "^3.9.1",
     "@jridgewell/trace-mapping": "^0.3.25",
     "@neondatabase/serverless": "^0.10.4",
@@ -57,6 +58,7 @@
     "express-session": "^1.18.1",
     "framer-motion": "^11.18.2",
     "input-otp": "^1.2.4",
+    "lightningcss": "^1.21.0",
     "lucide-react": "^0.453.0",
     "memorystore": "^1.6.7",
     "openai": "^4.85.4",
@@ -92,13 +94,13 @@
     "@types/ws": "^8.5.13",
     "@vitejs/plugin-react": "^4.3.2",
     "autoprefixer": "^10.4.20",
-    "drizzle-kit": "^0.30.4",
+    "drizzle-kit": "^0.19.1",
     "esbuild": "^0.25.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14",
     "tsx": "^4.19.1",
     "typescript": "5.6.3",
-    "vite": "^5.4.14"
+    "vite": "^6.2.0"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8"
