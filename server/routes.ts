@@ -2,7 +2,9 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import OpenAI from "openai";
+import dotenv from "dotenv";
 
+dotenv.config();
 if (!process.env.OPENAI_API_KEY) {
   throw new Error("OPENAI_API_KEY is required");
 }
@@ -50,7 +52,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Then use DALL-E to recreate the image based on the detailed description
       const imageResponse = await openai.images.generate({
-        model: "dall-e-3",
+        model: "dall-e-2",
         prompt: `Recreate this scene photorealistically: ${description}. Focus on precise details and maintain accurate proportions. The result should look as close as possible to a real photograph while capturing all the described elements perfectly.`,
         n: 1,
         size: "1024x1024",

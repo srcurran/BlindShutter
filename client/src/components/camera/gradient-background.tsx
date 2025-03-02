@@ -6,8 +6,8 @@ export function GradientBackground() {
       className="absolute inset-0"
       animate={{
         background: [
-          "linear-gradient(145deg, #614385, #516395)",
-          "linear-gradient(145deg, #516395, #614385)",
+          "linear-gradient(145deg,rgb(124, 94, 159), #516395)",
+          "linear-gradient(145deg, #516395,rgb(151, 70, 154))",
         ],
       }}
       transition={{

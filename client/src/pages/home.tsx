@@ -4,7 +4,7 @@ import { CameraButton } from "@/components/camera/camera-button";
 import { GradientBackground } from "@/components/camera/gradient-background";
 import { ResultImage } from "@/components/camera/result-image";
 import { ImageGallery } from "@/components/gallery/image-gallery";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { validateImageData } from "@/lib/openai";
@@ -15,10 +15,12 @@ export default function Home() {
   const [result, setResult] = useState<string | null>(null);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [refreshGallery, setRefreshGallery] = useState(false);
 
   // Fetch previous images
   const { data: images = [] } = useQuery<Image[]>({
-    queryKey: ['/api/images'],
+    queryKey: ["/api/images", refreshGallery], // Add refreshGallery as a query key
   });
 
   const { mutate: processImage, isPending } = useMutation({
@@ -77,6 +79,12 @@ export default function Home() {
     processImage(base64Image);
   };
 
+  const handleReset = () => {
+    setResult(null);
+    setProcessing(false);
+    setRefreshGallery(!refreshGallery); // Toggle refreshGallery
+  };
+
   return (
     <div className="min-h-screen relative overflow-hidden">
       <GradientBackground />
@@ -103,7 +111,7 @@ export default function Home() {
             <div className="w-64 h-64 bg-white/10 rounded-lg backdrop-blur-lg flex items-center justify-center">
               <div className="loading-spinner" />
             </div>
-            <p className="text-white mt-4 text-lg">Creating your masterpiece...</p>
+            <p className="text-white mt-4 text-lg">Generating</p>
           </motion.div>
         )}
 
@@ -116,16 +124,13 @@ export default function Home() {
           >
             <ResultImage
               imageUrl={result}
-              onReset={() => {
-                setResult(null);
-                setProcessing(false);
-              }}
+              onReset={handleReset} // Pass the new handleReset
             />
           </motion.div>
         )}
       </AnimatePresence>
 
-      <ImageGallery 
+      <ImageGallery
         images={images}
         isOpen={isGalleryOpen}
         onOpenChange={setIsGalleryOpen}
