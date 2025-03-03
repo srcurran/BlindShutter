@@ -9,6 +9,7 @@ if (!process.env.OPENAI_API_KEY) {
   throw new Error("OPENAI_API_KEY is required");
 }
 
+
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function registerRoutes(app: Express): Promise<Server> {
