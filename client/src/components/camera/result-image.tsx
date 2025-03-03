@@ -33,7 +33,7 @@ export function ResultImage({ imageUrl, onReset }: ResultImageProps) {
       id="result-image-container"
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="w-4/5 mx-auto bg-white backdrop-blur-md rounded-md p-4 pb-12 shadow-lg" // Updated styling
+      className="w-4/5 lg:w-1/2 mx-auto bg-white backdrop-blur-md p-4 pb-16 shadow-lg" // Updated styling
     >
       <motion.img
         initial={{ opacity: 0 }}
@@ -41,7 +41,7 @@ export function ResultImage({ imageUrl, onReset }: ResultImageProps) {
         transition={{ delay: 0.2 }}
         src={imageUrl}
         alt="AI Generated"
-        className="w-full rounded-2xl" // Updated styling
+        className="w-full rounded-md" // Updated styling
       />
 
       <div className="flex gap-2">
