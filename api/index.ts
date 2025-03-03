@@ -1,6 +1,5 @@
 import express, { type Request, Response, NextFunction, type Express } from "express";
-import { handleProcessImage } from "./process-image";
-import { handleGetImages } from "./images";
+import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import dotenv from "dotenv";
 import { createServer, type Server } from "http";
@@ -42,9 +41,7 @@ export async function createExpressApp(): Promise<{ app: Express, server: Server
         next();
     });
 
-    // Register routes
-    app.post("/api/process-image", handleProcessImage);
-    app.get("/api/images", handleGetImages);
+    const server = await registerRoutes(app);
 
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
         const status = err.status || err.statusCode || 500;
@@ -58,12 +55,10 @@ export async function createExpressApp(): Promise<{ app: Express, server: Server
     // setting up all the other routes so the catch-all route
     // doesn't interfere with the other routes
     if (process.env.NODE_ENV === "development") {
-        const server = createServer(app);
         await setupVite(app, server);
     } else {
         serveStatic(app);
     }
-    const server = createServer(app)
     return { app, server };
 }
 
