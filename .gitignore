@@ -5,3 +5,4 @@ api/public
 vite.config.ts.*
 *.tar.gz
 .env
+.idea/
